@@ -1,0 +1,39 @@
+[project]
+name = "gridpulse"
+version = "0.1.0"
+description = "A live US electricity-grid explorer with an AI copilot, built on Fast Dash. A Plotly Explore Page showcase."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = { text = "MIT" }
+authors = [{ name = "Kedar Dabhadkar" }]
+dependencies = [
+    "fast-dash>=0.5.1",
+    "pandas>=2.0",
+    "numpy>=1.26",
+    "statsmodels>=0.14",
+    "httpx>=0.27",
+    "langgraph>=0.2.60",
+    "langchain-openai>=0.2",
+    "langchain-core>=0.3",
+]
+
+[project.optional-dependencies]
+# Production server. Fast Dash's sidecar runs Flask-SocketIO in threading mode
+# (no eventlet/gevent installed), which is served by gunicorn's gthread worker
+# with a single worker process — the documented threading-mode deployment.
+# socket.io uses HTTP long-polling, which Fly.io proxies fine.
+prod = [
+    "gunicorn>=22.0; sys_platform != 'win32'",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gridpulse"]

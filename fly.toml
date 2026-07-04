@@ -1,0 +1,32 @@
+# Fly.io config for GridPulse.
+#
+# Secrets are NOT stored here — set them once with:
+#   fly secrets set OPENROUTER_API_KEY=... EIA_API_KEY=...
+# (Without them the app still runs on sample data + the offline copilot.)
+#
+# A single always-on machine keeps the sidecar's chat history and socket.io
+# session in one process.
+
+app = "gridpulse"
+primary_region = "sea"
+
+[build]
+
+[env]
+  GRIDPULSE_MODEL = "anthropic/claude-haiku-4.5"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_start_machines = true
+  auto_stop_machines = "off"
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 150
+    hard_limit = 200
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"

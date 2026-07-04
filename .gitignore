@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# Env / secrets — never commit keys
+.env
+*.env
+
+# Data cache (runtime), keep the committed snapshot fallback
+gridpulse/assets/_cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Build
+dist/
+build/
+site/
