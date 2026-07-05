@@ -2,6 +2,10 @@
 
 **A live US electricity-grid explorer with an AI copilot — built on [Fast Dash](https://github.com/dkedar7/fast_dash).**
 
+![GridPulse — the dashboard, with the Grid Copilot that just configured it hands-free](docs/hero.png)
+
+<sub>Above: the copilot was asked *"Show California demand and forecast 3 days ahead"* — it set the region and forecast horizon and re-ran the app on its own.</sub>
+
 Pick a grid operator and GridPulse charts its hourly demand, generation mix, and a short-term demand forecast with a confidence band. Then ask the **Grid Copilot** — *"compare California and Texas, and forecast the next 3 days"* — and watch the dashboard reconfigure itself and re-run. The controls flash, the charts refresh, and the copilot explains what changed.
 
 The whole dashboard is **one typed Python function**. The copilot is a **LangGraph agent on OpenRouter** mounted as a Fast Dash sidecar that drives those same controls — anything you can do, it can do.
