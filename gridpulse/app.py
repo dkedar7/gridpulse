@@ -18,7 +18,7 @@ from . import charts
 from .agent import make_copilot
 from .config import MANTINE_ACCENT, REGIONS
 from .data import data_source, load_demand, load_fuel_mix
-from .forecast import forecast_demand
+from .forecast import forecast_demand, warmup as forecast_warmup
 from .insights import build_insights
 
 # --- typed input aliases (drive Fast Dash component inference) ------------- #
@@ -159,6 +159,11 @@ def build_app() -> FastDash:
 
 app = build_app()
 server = app.app.server  # WSGI entry point for gunicorn / Fly
+
+# Warm the forecast model off the request path so the first Run is fast.
+import threading  # noqa: E402
+
+threading.Thread(target=forecast_warmup, daemon=True).start()
 
 if __name__ == "__main__":
     app.run()

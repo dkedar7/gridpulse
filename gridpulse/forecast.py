@@ -9,10 +9,24 @@ shape. Illustrative statistical forecast — not a production grid forecast.
 
 from __future__ import annotations
 
+import hashlib
 import warnings
 
 import numpy as np
 import pandas as pd
+
+# Fitting Holt-Winters is the one CPU-bound step in a callback; on a small VM it
+# dominates latency. The synthetic/live series is stable within an hour, so we
+# memoise by (series fingerprint, horizon). Bounded so it can't grow unbounded.
+_FC_CACHE: dict[tuple, pd.DataFrame] = {}
+_FC_CACHE_MAX = 64
+
+
+def _series_key(y: pd.Series, horizon: int) -> tuple:
+    digest = hashlib.blake2b(
+        np.ascontiguousarray(y.to_numpy(dtype=float)).tobytes(), digest_size=8
+    ).hexdigest()
+    return (digest, len(y), horizon)
 
 
 def forecast_demand(demand: pd.Series, horizon: int = 48) -> pd.DataFrame:
@@ -21,8 +35,13 @@ def forecast_demand(demand: pd.Series, horizon: int = 48) -> pd.DataFrame:
     Returns a frame indexed by future hour with ``forecast`` / ``lower`` /
     ``upper`` (MW). Degrades to a seasonal-naive forecast if the history is too
     short or the model fails to converge, so a chart is always produced.
+    Results are memoised per (series, horizon) so repeat views are instant.
     """
     y = pd.to_numeric(demand, errors="coerce").astype(float).ffill().dropna()
+
+    key = _series_key(y, horizon) if len(y) else None
+    if key is not None and key in _FC_CACHE:
+        return _FC_CACHE[key].copy()
     if len(y) < 2:
         raise ValueError("need at least a couple of demand points to forecast")
 
@@ -41,7 +60,7 @@ def forecast_demand(demand: pd.Series, horizon: int = 48) -> pd.DataFrame:
 
     steps = np.arange(1, horizon + 1)
     band = 1.96 * resid_std * np.sqrt(1.0 + steps / season)
-    return pd.DataFrame(
+    result = pd.DataFrame(
         {
             "forecast": np.asarray(point, dtype=float),
             "lower": np.asarray(point, dtype=float) - band,
@@ -49,6 +68,28 @@ def forecast_demand(demand: pd.Series, horizon: int = 48) -> pd.DataFrame:
         },
         index=future_idx,
     )
+    if key is not None:
+        if len(_FC_CACHE) >= _FC_CACHE_MAX:
+            _FC_CACHE.clear()
+        _FC_CACHE[key] = result.copy()
+    return result
+
+
+def warmup() -> None:
+    """Prime statsmodels/BLAS so the first real forecast isn't cold.
+
+    The initial Holt-Winters fit pays a one-off import/JIT cost; running a tiny
+    throwaway fit at startup moves that cost off the first user request.
+    """
+    try:
+        idx = pd.date_range("2026-01-01", periods=72, freq="h")
+        y = pd.Series(
+            40000 + 8000 * np.sin(np.arange(72) / 24 * 2 * np.pi), index=idx
+        )
+        forecast_demand(y, 24)
+        _FC_CACHE.clear()  # don't keep the synthetic warmup entry
+    except Exception:  # noqa: BLE001 — warmup is best-effort
+        pass
 
 
 def _holt_winters(y: pd.Series, horizon: int, season: int) -> tuple[np.ndarray, float]:
