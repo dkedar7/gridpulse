@@ -73,7 +73,7 @@ def build_insights(
     note = (
         "Live EIA feed."
         if source == "live"
-        else "Sample data (set `EIA_API_KEY` for the live EIA feed)."
+        else "Sample data (set EIA_API_KEY for the live EIA feed)."
     )
-    lines.append(f"\n<sub>{note}</sub>")
+    lines.append(f"\n*{note}*")
     return "\n".join(lines)

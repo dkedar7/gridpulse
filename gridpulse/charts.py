@@ -13,9 +13,11 @@ from .config import ACCENT, FUEL_TYPES
 
 _FUEL_COLOR = {label: color for _code, (label, color) in FUEL_TYPES.items()}
 
+# No Plotly title — the mosaic panel header already labels each chart, and a
+# figure title collided with the top horizontal legend.
 _LAYOUT = dict(
     template="plotly_white",
-    margin=dict(l=56, r=20, t=52, b=40),
+    margin=dict(l=56, r=20, t=34, b=40),
     legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
     hovermode="x unified",
     font=dict(family="Inter, system-ui, sans-serif", size=13),
@@ -64,10 +66,7 @@ def demand_figure(
         fig.add_vline(
             x=demand.index[-1], line=dict(color="#adb5bd", width=1, dash="dot")
         )
-    fig.update_layout(
-        title=f"{region_label} — {metric_label} & forecast",
-        yaxis_title="MW", **_LAYOUT,
-    )
+    fig.update_layout(yaxis_title="MW", **_LAYOUT)
     return fig
 
 
@@ -82,7 +81,5 @@ def mix_figure(region_label: str, fuel: pd.DataFrame) -> go.Figure:
                 mode="none", fillcolor=color, hovertemplate="%{y:,.0f} MW",
             )
         )
-    fig.update_layout(
-        title=f"{region_label} — generation mix", yaxis_title="MW", **_LAYOUT
-    )
+    fig.update_layout(yaxis_title="MW", **_LAYOUT)
     return fig
