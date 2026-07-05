@@ -16,7 +16,7 @@ from fast_dash import FastDash, Graph, Markdown, Table
 
 from . import charts
 from .agent import make_copilot
-from .config import ACCENT, REGIONS
+from .config import MANTINE_ACCENT, REGIONS
 from .data import data_source, load_demand, load_fuel_mix
 from .forecast import forecast_demand
 from .insights import build_insights
@@ -145,7 +145,7 @@ def build_app() -> FastDash:
         ],
         title="GridPulse",
         subheader="Live US electricity grid explorer with an AI copilot",
-        accent=ACCENT,
+        accent=MANTINE_ACCENT,
         github_url="https://github.com/dkedar7/fast_dash",
         chat_agent=make_copilot(),
         chat_agent_title="Grid Copilot",

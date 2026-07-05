@@ -48,7 +48,10 @@ FUEL_TYPES: dict[str, tuple[str, str]] = {
 FUEL_ORDER = list(FUEL_TYPES.keys())  # stacking / legend order
 
 # --- App-wide knobs ------------------------------------------------------- #
-ACCENT = "#2f9e44"  # GridPulse green — the Mantine primaryColor / accent=
+# Fast Dash's accent= maps to Mantine's primaryColor, which must be a *named*
+# Mantine palette key (not a hex). ACCENT (hex) is used for Plotly chart lines.
+MANTINE_ACCENT = "green"
+ACCENT = "#2f9e44"  # GridPulse green — for Plotly figures
 
 # Environment-driven secrets (never hard-coded). Absent key => snapshot mode.
 EIA_API_KEY = os.environ.get("EIA_API_KEY", "").strip()
