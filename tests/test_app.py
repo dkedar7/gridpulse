@@ -38,7 +38,10 @@ def test_net_generation_metric_switches_series():
 def test_build_app_mounts_driving_sidecar():
     app = build_app()
     assert app.has_chat_sidecar is True
-    assert app.chat_agent_drive is True
+    # fast-dash 0.6: chat_agent_drive= was replaced by the chat_tools allowlist.
+    assert app.chat_tools_config.get("set_input") is not False
+    assert app.chat_tools_config.get("run_app") is not False
+    assert "read_app" in app.chat_tools_config
 
 
 def test_input_contract_matches_controls():

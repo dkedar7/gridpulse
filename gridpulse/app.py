@@ -147,9 +147,12 @@ def build_app() -> FastDash:
         subheader="Live US electricity grid explorer with an AI copilot",
         accent=MANTINE_ACCENT,
         github_url="https://github.com/dkedar7/fast_dash",
-        chat_agent=make_copilot(),
-        chat_agent_title="Grid Copilot",
-        chat_agent_drive=True,
+        chat=make_copilot(),
+        chat_title="Grid Copilot",
+        # The copilot only emits set_input / run_app drive frames, so grant
+        # exactly those (plus read_app for ctx.inputs) — not the full default
+        # toolkit, which would also expose set_output / set_layout / run_python.
+        chat_tools=("read_app", "set_input", "run_app"),
         about=True,
     )
     fd.app.title = _PAGE_TITLE

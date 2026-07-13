@@ -7,7 +7,7 @@ requires-python = ">=3.11,<3.14"
 license = { text = "MIT" }
 authors = [{ name = "Kedar Dabhadkar" }]
 dependencies = [
-    "fast-dash>=0.5.2",
+    "fast-dash>=0.6.2",
     "pandas>=2.0",
     "numpy>=1.26",
     "statsmodels>=0.14",
